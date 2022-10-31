@@ -10,10 +10,11 @@
 #   -E                           = CMake command mode.
 #   --build <dir>                = Build a CMake-generated project binary tree.
 #   --find-package               = Run in pkg-config like mode.
+#   --install                    = install an already-generated project
 #
 case $1 in
 
-  -E|--build|--find-package)
+  -E|--build|--find-package|--install)
       exec /usr/bin/cmake "$@"
       ;;
 
