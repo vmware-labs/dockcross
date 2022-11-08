@@ -116,9 +116,10 @@ $(GEN_IMAGE_DOCKERFILES) Dockerfile: %Dockerfile: %Dockerfile.in $(DOCKER_COMPOS
 web-wasm: web-wasm/Dockerfile
 	mkdir -p $@/imagefiles && cp -r imagefiles $@/
 	cp -r test web-wasm/
-	$(DOCKER) build -t $(ORG)/web-wasm:latest \
-		-t $(ORG)/web-wasm:$(TAG) \
+	$(DOCKER) build -t $(ORG)/web-wasm:$(TAG) \
+		-t $(ORG)/web-wasm:latest \
 		--build-arg IMAGE=$(ORG)/web-wasm \
+		--build-arg VERSION=$(TAG) \
 		--build-arg VCS_REF=`git rev-parse --short HEAD` \
 		--build-arg VCS_URL=`git config --get remote.origin.url` \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
@@ -128,8 +129,8 @@ web-wasm: web-wasm/Dockerfile
 
 web-wasm.test: web-wasm
 	cp -r test web-wasm/
-	$(DOCKER) run $(RM) $(ORG)/web-wasm > $(BIN)/dockcross-web-wasm && chmod +x $(BIN)/dockcross-web-wasm
-	$(BIN)/dockcross-web-wasm python test/run.py --exe-suffix ".js"
+	$(DOCKER) run $(RM) $(ORG)/web-wasm:latest > $(BIN)/dockcross-web-wasm && chmod +x $(BIN)/dockcross-web-wasm
+	$(BIN)/dockcross-web-wasm -i $(ORG)/web-wasm:latest python test/run.py --exe-suffix ".js"
 	rm -rf web-wasm/test
 
 #
@@ -141,9 +142,10 @@ manylinux2014-aarch64: manylinux2014-aarch64/Dockerfile
 	@# Get libstdc++ from quay.io/pypa/manylinux2014_aarch64 container
 	docker run -v `pwd`:/host --rm -e LIB_PATH=/host/$@/xc_script/ quay.io/pypa/manylinux2014_aarch64 bash -c "PASS=1 /host/$@/xc_script/docker_setup_scrpits/copy_libstd.sh"
 	mkdir -p $@/imagefiles && cp -r imagefiles $@/
-	$(DOCKER) build -t $(ORG)/manylinux2014-aarch64:latest \
-		-t $(ORG)/manylinux2014-aarch64:$(TAG) \
+	$(DOCKER) build -t $(ORG)/manylinux2014-aarch64:$(TAG) \
+		-t $(ORG)/manylinux2014-aarch64:latest \
 		--build-arg IMAGE=$(ORG)/manylinux2014-aarch64 \
+		--build-arg VERSION=$(TAG) \
 		--build-arg VCS_REF=`git rev-parse --short HEAD` \
 		--build-arg VCS_URL=`git config --get remote.origin.url` \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
@@ -153,18 +155,19 @@ manylinux2014-aarch64: manylinux2014-aarch64/Dockerfile
 	docker run -v `pwd`:/host --rm quay.io/pypa/manylinux2014_aarch64 bash -c "rm -rf /host/$@/xc_script/usr"
 
 manylinux2014-aarch64.test: manylinux2014-aarch64
-	$(DOCKER) run $(RM) $(ORG)/manylinux2014-aarch64 > $(BIN)/dockcross-manylinux2014-aarch64 \
+	$(DOCKER) run $(RM) $(ORG)/manylinux2014-aarch64:latest > $(BIN)/dockcross-manylinux2014-aarch64 \
 		&& chmod +x $(BIN)/dockcross-manylinux2014-aarch64
-	$(BIN)/dockcross-manylinux2014-aarch64 /opt/python/cp38-cp38/bin/python test/run.py
+	$(BIN)/dockcross-manylinux2014-aarch64 -i $(ORG)/manylinux2014-aarch64:latest /opt/python/cp38-cp38/bin/python test/run.py
 
 #
 # manylinux_2_28-x64
 #
 manylinux_2_28-x64: manylinux_2_28-x64/Dockerfile
 	mkdir -p $@/imagefiles && cp -r imagefiles $@/
-	$(DOCKER) build -t $(ORG)/manylinux_2_28-x64:latest \
-		-t $(ORG)/manylinux_2_28-x64:$(TAG) \
+	$(DOCKER) build -t $(ORG)/manylinux_2_28-x64:$(TAG) \
+		-t $(ORG)/manylinux_2_28-x64:latest \
 		--build-arg IMAGE=$(ORG)/manylinux_2_28-x64 \
+		--build-arg VERSION=$(TAG) \
 		--build-arg VCS_REF=`git rev-parse --short HEAD` \
 		--build-arg VCS_URL=`git config --get remote.origin.url` \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
@@ -172,18 +175,19 @@ manylinux_2_28-x64: manylinux_2_28-x64/Dockerfile
 	rm -rf $@/imagefiles
 
 manylinux_2_28-x64.test: manylinux_2_28-x64
-	$(DOCKER) run $(RM) $(ORG)/manylinux_2_28-x64 > $(BIN)/dockcross-manylinux_2_28-x64 \
+	$(DOCKER) run $(RM) $(ORG)/manylinux_2_28-x64:latest > $(BIN)/dockcross-manylinux_2_28-x64 \
 		&& chmod +x $(BIN)/dockcross-manylinux_2_28-x64
-	$(BIN)/dockcross-manylinux_2_28-x64 /opt/python/cp310-cp310/bin/python test/run.py
+	$(BIN)/dockcross-manylinux_2_28-x64 -i $(ORG)/manylinux_2_28-x64:latest /opt/python/cp310-cp310/bin/python test/run.py
 
 #
 # manylinux2014-x64
 #
 manylinux2014-x64: manylinux2014-x64/Dockerfile
 	mkdir -p $@/imagefiles && cp -r imagefiles $@/
-	$(DOCKER) build -t $(ORG)/manylinux2014-x64:latest \
-		-t $(ORG)/manylinux2014-x64:$(TAG) \
+	$(DOCKER) build -t $(ORG)/manylinux2014-x64:$(TAG) \
+		-t $(ORG)/manylinux2014-x64:latest \
 		--build-arg IMAGE=$(ORG)/manylinux2014-x64 \
+		--build-arg VERSION=$(TAG) \
 		--build-arg VCS_REF=`git rev-parse --short HEAD` \
 		--build-arg VCS_URL=`git config --get remote.origin.url` \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
@@ -191,18 +195,19 @@ manylinux2014-x64: manylinux2014-x64/Dockerfile
 	rm -rf $@/imagefiles
 
 manylinux2014-x64.test: manylinux2014-x64
-	$(DOCKER) run $(RM) $(ORG)/manylinux2014-x64 > $(BIN)/dockcross-manylinux2014-x64 \
+	$(DOCKER) run $(RM) $(ORG)/manylinux2014-x64:latest > $(BIN)/dockcross-manylinux2014-x64 \
 		&& chmod +x $(BIN)/dockcross-manylinux2014-x64
-	$(BIN)/dockcross-manylinux2014-x64 /opt/python/cp38-cp38/bin/python test/run.py
+	$(BIN)/dockcross-manylinux2014-x64 -i $(ORG)/manylinux2014-x64:latest /opt/python/cp38-cp38/bin/python test/run.py
 
 #
 # manylinux2014-x86
 #
 manylinux2014-x86: manylinux2014-x86/Dockerfile
 	mkdir -p $@/imagefiles && cp -r imagefiles $@/
-	$(DOCKER) build -t $(ORG)/manylinux2014-x86:latest \
-		-t $(ORG)/manylinux2014-x86:$(TAG) \
+	$(DOCKER) build -t $(ORG)/manylinux2014-x86:$(TAG) \
+		-t $(ORG)/manylinux2014-x86:latest \
 		--build-arg IMAGE=$(ORG)/manylinux2014-x86 \
+		--build-arg VERSION=$(TAG) \
 		--build-arg VCS_REF=`git rev-parse --short HEAD` \
 		--build-arg VCS_URL=`git config --get remote.origin.url` \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
@@ -210,9 +215,9 @@ manylinux2014-x86: manylinux2014-x86/Dockerfile
 	rm -rf $@/imagefiles
 
 manylinux2014-x86.test: manylinux2014-x86
-	$(DOCKER) run $(RM) $(ORG)/manylinux2014-x86 > $(BIN)/dockcross-manylinux2014-x86 \
+	$(DOCKER) run $(RM) $(ORG)/manylinux2014-x86:latest > $(BIN)/dockcross-manylinux2014-x86 \
 		&& chmod +x $(BIN)/dockcross-manylinux2014-x86
-	$(BIN)/dockcross-manylinux2014-x86 /opt/python/cp38-cp38/bin/python test/run.py
+	$(BIN)/dockcross-manylinux2014-x86 -i $(ORG)/manylinux2014-x86:latest /opt/python/cp38-cp38/bin/python test/run.py
 
 #
 # base
@@ -225,7 +230,7 @@ base: Dockerfile imagefiles/
 		.
 
 base.test: base
-	$(DOCKER) run $(RM) $(ORG)/base > $(BIN)/dockcross-base && chmod +x $(BIN)/dockcross-base
+	$(DOCKER) run $(RM) $(ORG)/base:latest > $(BIN)/dockcross-base && chmod +x $(BIN)/dockcross-base
 
 # display
 #
@@ -243,6 +248,7 @@ $(STANDARD_IMAGES): %: %/Dockerfile base
 	$(DOCKER) build -t $(ORG)/$@:latest \
 		-t $(ORG)/$@:$(TAG) \
 		--build-arg IMAGE=$(ORG)/$@ \
+		--build-arg VERSION=$(TAG) \
 		--build-arg VCS_REF=`git rev-parse --short HEAD` \
 		--build-arg VCS_URL=`git config --get remote.origin.url` \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
@@ -271,9 +277,9 @@ bash-check:
 #
 .SECONDEXPANSION:
 $(addsuffix .test,$(STANDARD_IMAGES)): $$(basename $$@)
-	$(DOCKER) run $(RM) $(ORG)/$(basename $@) > $(BIN)/dockcross-$(basename $@) \
+	$(DOCKER) run $(RM) $(ORG)/$(basename $@):latest > $(BIN)/dockcross-$(basename $@) \
 		&& chmod +x $(BIN)/dockcross-$(basename $@)
-	$(BIN)/dockcross-$(basename $@) python3 test/run.py $($@_ARGS)
+	$(BIN)/dockcross-$(basename $@) -i $(ORG)/$(basename $@):latest python3 test/run.py $($@_ARGS)
 
 #
 # testing prerequisites implicit rule
