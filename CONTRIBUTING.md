@@ -127,7 +127,8 @@ Then you must create a file named `Dockerfile.in` in the image folder (`linux-ar
 Copy text to `Dockerfile.in` file:
 
 ```docker
-FROM dockcross/base:latest
+ARG ORG=dockcross
+FROM ${ORG}/base:latest
 
 LABEL maintainer="Matt McCormick matt.mccormick@kitware.com"
 

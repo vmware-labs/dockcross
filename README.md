@@ -565,6 +565,26 @@ The key difference is that [dockbuild](https://github.com/dockbuild/dockbuild#re
 
 **dockcross** is used to build binaries for many different platforms. **dockcross** performs a cross compilation where the host build system is a Linux x86_64 / amd64 Docker image (so that it can be used for building binaries on any system which can run Docker images) and the target runtime system varies.
 
+## Build images by yourself
+
+Perbuilt images available on Docker hub are single architecture amd64 images. Those images work evan on different architectures: for example, if you run a dockcross image on Docker running on an Apple M1, the image will run in emulation mode, meaning that it will still work as expected, although it will be slower than running on native hardware (you can expect a factor or 10 or more).
+
+To overcome this limitation, you can build your own images on non-amd64 architectures. To do so, you can use the `Makefile` provided in this repository. For example, to build the `linux-armv7` image, and provided that your Docker hub organization name is `ACME`, you can run:
+
+```bash
+$ make ORG=ACME base
+$ make ORG=ACME linux-armv7
+```
+
+This will create the Docker images `ACME/base` and `ACME/linux-armv7`, so that you can later launch a container using the `ACME/linux-armv7` image:
+
+```
+$ docker run --rm ACME/linux-armv7 uname -a
+Linux 89b164ee8d90 5.15.49-linuxkit #1 SMP PREEMPT Tue Sep 13 07:51:32 UTC 2022 aarch64 GNU/Linux
+```
+
+Note that the architecture is now `aarch64` instead of `amd64`, so it runs natively on the Apple M1.
+
 \-\--
 
 Credits:
