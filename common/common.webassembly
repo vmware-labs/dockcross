@@ -67,7 +67,7 @@ RUN mkdir -p /wasi-runtimes/wasm3/bin && \
   chmod +x /wasi-runtimes/wasm3/bin/wasm3
 ENV PATH "/wasi-runtimes/wasm3/bin:$PATH"
 
-ENV WAVM_VERSION 2021-12-15
+ENV WAVM_VERSION 2022-05-14
 RUN mkdir -p /wasi-runtimes/wavm/ && \
   curl -LO https://github.com/WAVM/WAVM/releases/download/nightly%2F${WAVM_VERSION}/wavm-0.0.0-prerelease-linux.tar.gz && \
   tar -xv -C /wasi-runtimes/wavm/ -f wavm-0.0.0-prerelease-linux.tar.gz
