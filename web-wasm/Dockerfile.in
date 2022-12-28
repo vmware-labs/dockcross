@@ -1,4 +1,4 @@
-ARG DOCKER_IMAGE_VERSION=3.1.13
+ARG DOCKER_IMAGE_VERSION=3.1.28
 FROM emscripten/emsdk:$DOCKER_IMAGE_VERSION
 
 LABEL maintainer="Matt McCormick matt.mccormick@kitware.com"
