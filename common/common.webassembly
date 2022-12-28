@@ -2,9 +2,9 @@
 #
 # Common WebAssembly tools.
 
-# main 2021-12-31
-ENV BINARYEN_GIT_TAG 6137b338c7fb37ba98b63c31225ec9cfda8cfa59
-RUN git clone https://github.com/WebAssembly/binaryen.git && \
+# main 2022-12-27
+ENV BINARYEN_GIT_TAG cec66beba45668dbad74abd2396bb80d33595ff0
+RUN git clone --recursive https://github.com/WebAssembly/binaryen.git && \
   cd binaryen && \
   git checkout ${BINARYEN_GIT_TAG} && \
   cd ../ && \
@@ -22,8 +22,8 @@ RUN git clone https://github.com/WebAssembly/binaryen.git && \
   cd ../ && \
   rm -rf binaryen*
 
-# main 2021-12-31
-ENV WABT_GIT_TAG a4366956e877c404d328358b2c00320b476763c0
+# main 2022-12-27, 1.0.32
+ENV WABT_GIT_TAG e5b042a72e6b6395e1d77901e7a413d6af87ae67
 RUN git clone --recurse-submodules https://github.com/WebAssembly/wabt.git && \
   cd wabt && \
   git checkout ${WABT_GIT_TAG} && \
@@ -67,7 +67,7 @@ RUN mkdir -p /wasi-runtimes/wasm3/bin && \
   chmod +x /wasi-runtimes/wasm3/bin/wasm3
 ENV PATH "/wasi-runtimes/wasm3/bin:$PATH"
 
-ENV WAVM_VERSION 2021-12-15
+ENV WAVM_VERSION 2022-05-14
 RUN mkdir -p /wasi-runtimes/wavm/ && \
   curl -LO https://github.com/WAVM/WAVM/releases/download/nightly%2F${WAVM_VERSION}/wavm-0.0.0-prerelease-linux.tar.gz && \
   tar -xv -C /wasi-runtimes/wavm/ -f wavm-0.0.0-prerelease-linux.tar.gz
