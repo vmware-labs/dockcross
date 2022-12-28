@@ -2,9 +2,9 @@
 #
 # Common WebAssembly tools.
 
-# main 2021-12-31
-ENV BINARYEN_GIT_TAG 6137b338c7fb37ba98b63c31225ec9cfda8cfa59
-RUN git clone https://github.com/WebAssembly/binaryen.git && \
+# main 2022-12-27
+ENV BINARYEN_GIT_TAG cec66beba45668dbad74abd2396bb80d33595ff0
+RUN git clone --recursive https://github.com/WebAssembly/binaryen.git && \
   cd binaryen && \
   git checkout ${BINARYEN_GIT_TAG} && \
   cd ../ && \
