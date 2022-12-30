@@ -6,5 +6,7 @@ set(CMAKE_SYSROOT $ENV{WASI_SYSROOT})
 
 set(CMAKE_C_COMPILER /usr/local/bin/clang-wasi-sysroot.sh)
 set(CMAKE_CXX_COMPILER /usr/local/bin/clang++-wasi-sysroot.sh)
+set(CMAKE_AR llvm-ar-$ENV{LLVM_VERSION})
+set(CMAKE_RANLIB llvm-ranlib-$ENV{LLVM_VERSION})
 
 set(CMAKE_CROSSCOMPILING_EMULATOR /wasi-runtimes/wasmtime/bin/wasmtime-pwd.sh)
