@@ -42,7 +42,7 @@ done
 
 
 # Adding cross compiler path in PATH env variable
-export PATH=/usr/xcc/aarch64-unknown-linux-gnueabi/bin:$PATH
+export PATH=/usr/xcc/aarch64-unknown-linux-gnu/bin:$PATH
 
 OLD_PATH=$PATH
 CROSS_PY_BASE=/opt/_internal
@@ -94,8 +94,9 @@ for python_ver in $python_vers; do
     export PATH
 
     ./configure --prefix=${TARGET_PYPATH} \
-                --host=aarch64-unknown-linux-gnueabi \
+                --host=aarch64-unknown-linux-gnu \
                 --build=x86_64-linux-gnu \
+                --with-build-python=yes \
                 --without-ensurepip \
                 ac_cv_buggy_getaddrinfo=no \
                 ac_cv_file__dev_ptmx=yes \

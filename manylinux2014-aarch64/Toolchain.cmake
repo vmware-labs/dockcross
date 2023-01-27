@@ -3,7 +3,7 @@ set(CMAKE_SYSTEM_VERSION 1)
 set(CMAKE_SYSTEM_PROCESSOR aarch64)
 set(MANYLINUX2014 TRUE)
 
-set(cross_triple "aarch64-unknown-linux-gnueabi")
+set(cross_triple "aarch64-unknown-linux-gnu")
 set(cross_root /usr/xcc/${cross_triple})
 
 set(CMAKE_C_COMPILER $ENV{CC})
