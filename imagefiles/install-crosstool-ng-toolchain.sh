@@ -75,6 +75,13 @@ git fetch --tags
 # checkout 
 git checkout ${REV}
 
+if [ ${REV} = "crosstool-ng-1.25.0" ]; then
+  patch scripts/build/companion_libs/050-zlib.sh -i /dockcross/crosstool-ng-zlib-target.patch
+  # Clean patch
+  rm /dockcross/crosstool-ng-zlib-target.patch
+fi
+
+
 # Bootstrap and install the tool.
 BOOTSTRAP_PREFIX="${CTNG}/prefix"
 ./bootstrap
