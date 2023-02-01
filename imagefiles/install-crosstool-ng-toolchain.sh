@@ -53,8 +53,8 @@ if [ -z ${CONFIG_PATH} ] || [ ! -f ${CONFIG_PATH} ]; then
 fi
 
 if [ -z ${REV} ]; then
-  echo "WARNING: No version selected, use default version: crosstool-ng-1.23.0 (-v)."
-  REV=crosstool-ng-1.23.0
+  echo "WARNING: No version selected, use default version: crosstool-ng-1.25.0 (-v)."
+  REV=crosstool-ng-1.25.0
 fi
 
 
@@ -75,14 +75,12 @@ git fetch --tags
 # checkout 
 git checkout ${REV}
 
-if [ ${REV} = "crosstool-ng-1.23.0" ]; then
-  patch scripts/build/companion_libs/210-expat.sh -i /dockcross/crosstool-ng-expat.patch
-  # Patch to fix error with bash 5 and up: https://github.com/pfalcon/esp-open-sdk/issues/365
-  patch configure.ac -i /dockcross/Fix-error-with-bash-5-and-up.patch
+if [ ${REV} = "crosstool-ng-1.25.0" ]; then
+  patch scripts/build/companion_libs/050-zlib.sh -i /dockcross/crosstool-ng-zlib-target.patch
   # Clean patch
-  rm /dockcross/Fix-error-with-bash-5-and-up.patch
-  rm /dockcross/crosstool-ng-expat.patch
+  rm /dockcross/crosstool-ng-zlib-target.patch
 fi
+
 
 # Bootstrap and install the tool.
 BOOTSTRAP_PREFIX="${CTNG}/prefix"

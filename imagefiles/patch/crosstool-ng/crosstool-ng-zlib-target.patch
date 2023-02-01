@@ -1,0 +1,77 @@
+--- a/scripts/build/companion_libs/050-zlib.sh
++++ b/scripts/build/companion_libs/050-zlib.sh
+@@ -9,7 +9,7 @@ do_zlib_for_host() { :; }
+ do_zlib_for_target() { :; }
+ 
+ # Overide functions depending on configuration
+-if [ "${CT_ZLIB}" = "y" ]; then
++if [ "${CT_ZLIB}" = "y" -o "${CT_ZLIB_TARGET}" = "y" ]; then
+ 
+ # Download zlib
+ do_zlib_get() {
+@@ -21,6 +21,8 @@ do_zlib_extract() {
+     CT_ExtractPatch ZLIB
+ }
+ 
++if [ "${CT_ZLIB}" = "y" ]; then
++
+ # Build zlib for running on build
+ # - always build statically
+ # - install in build-tools prefix
+@@ -61,6 +63,38 @@ do_zlib_for_host() {
+     CT_EndStep
+ }
+ 
++fi # CT_ZLIB
++
++if [ "${CT_ZLIB_TARGET}" = "y" ]; then
++
++do_zlib_for_target() {
++    local -a zlib_opts
++    local prefix
++
++    CT_DoStep INFO "Installing zlib for the target"
++    CT_mkdir_pushd "${CT_BUILD_DIR}/build-zlib-target-${CT_TARGET}"
++
++    case "${CT_TARGET}" in
++        *-*-mingw*)
++            prefix="/mingw"
++            ;;
++        *)
++            prefix="/usr"
++            ;;
++    esac
++
++    zlib_opts+=( "host=${CT_TARGET}" )
++    zlib_opts+=( "prefix=${prefix}" )
++    zlib_opts+=( "destdir=${CT_SYSROOT_DIR}" )
++    zlib_opts+=( "cflags=${CT_ALL_TARGET_CFLAGS}" )
++    do_zlib_backend "${zlib_opts[@]}"
++
++    CT_Popd
++    CT_EndStep
++}
++
++fi # CT_ZLIB_TARGET
++
+ # Build zlib
+ #     Parameter     : description               : type      : default
+ #     host          : machine to run on         : tuple     : (none)
+@@ -72,6 +106,7 @@ do_zlib_backend() {
+     local prefix
+     local cflags
+     local ldflags
++    local destdir
+     local arg
+     local -a extra_config
+     local -a extra_make
+@@ -126,7 +161,7 @@ do_zlib_backend() {
+     fi
+ 
+     CT_DoLog EXTRA "Installing zlib"
+-    CT_DoExecLog ALL make "${extra_make[@]}" install
++    CT_DoExecLog ALL make "${extra_make[@]}" install DESTDIR="${destdir}"
+ }
+ 
+-fi # CT_ZLIB
++fi # CT_ZLIB || CT_ZLIB_TARGET
