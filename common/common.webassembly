@@ -22,8 +22,8 @@ RUN git clone --recursive https://github.com/WebAssembly/binaryen.git && \
   cd ../ && \
   rm -rf binaryen*
 
-# main 2022-12-27, 1.0.32
-ENV WABT_GIT_TAG e5b042a72e6b6395e1d77901e7a413d6af87ae67
+# main 2023-03-16
+ENV WABT_GIT_TAG 090d4674c86b00e31d18e77f2c8f8570a68e1cf1
 RUN git clone --recurse-submodules https://github.com/WebAssembly/wabt.git && \
   cd wabt && \
   git checkout ${WABT_GIT_TAG} && \
