@@ -1,0 +1,549 @@
+From 6ab898d6b5c84fe836134d64bf4269932ffb6249 Mon Sep 17 00:00:00 2001
+From: Ken Kassing <kkassing@vmware.com>
+Date: Sun, 11 Jun 2023 17:43:53 -0400
+Subject: [PATCH] Revert gcc 8.5 to 8.2
+
+---
+ .../0000-libtool-leave-framework-alone.patch  |  0
+ .../{8.5.0 => 8.2.0}/0001-uclibc-conf.patch   |  0
+ ...d-undefined-extern-var-refs-nor-fpic.patch |  6 +-
+ ...cc-plugin-POSIX-include-sys-select-h.patch |  0
+ .../0004-arm-softfloat-libgcc.patch           |  0
+ .../0005-fix-m68k-uclinux.patch               |  2 +-
+ .../0006-libgfortran-missing-include.patch    |  8 +--
+ .../0007-nios2-bad-multilib-default.patch     |  0
+ ...libgcc-disable-split-stack-nothreads.patch |  0
+ .../{8.5.0 => 8.2.0}/0009-bionic-ndk.patch    |  0
+ .../gcc/{8.5.0 => 8.2.0}/0010-crystax.patch   | 22 +++----
+ .../gcc/{8.5.0 => 8.2.0}/0011-crystax.patch   |  0
+ .../gcc/{8.5.0 => 8.2.0}/0012-crystax.patch   | 10 +--
+ .../gcc/{8.5.0 => 8.2.0}/0013-crystax.patch   |  2 +-
+ .../gcc/{8.5.0 => 8.2.0}/0014-crystax.patch   |  0
+ .../gcc/{8.5.0 => 8.2.0}/0015-crystax.patch   |  2 +-
+ .../gcc/{8.5.0 => 8.2.0}/0016-crystax.patch   |  0
+ .../gcc/{8.5.0 => 8.2.0}/0017-crystax.patch   |  0
+ ...d-multilib-support-for-linux-targets.patch |  0
+ .../gcc/{8.5.0 => 8.2.0}/0019-isl-0.20.patch  |  0
+ .../{8.5.0 => 8.2.0}/0020-ARM-fix-cmse.patch  | 21 ++++---
+ ...1-arm-Make-arm_cmse.h-C99-compatible.patch | 10 +--
+ packages/gcc/8.2.0/chksum                     |  8 +++
+ packages/gcc/{8.5.0 => 8.2.0}/version.desc    |  0
+ .../0022-ARC-Update-fma-expansions.patch      | 63 -------------------
+ packages/gcc/8.5.0/chksum                     |  8 ---
+ 26 files changed, 52 insertions(+), 110 deletions(-)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0000-libtool-leave-framework-alone.patch (100%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0001-uclibc-conf.patch (100%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch (98%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0003-gcc-plugin-POSIX-include-sys-select-h.patch (100%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0004-arm-softfloat-libgcc.patch (100%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0005-fix-m68k-uclinux.patch (96%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0006-libgfortran-missing-include.patch (74%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0007-nios2-bad-multilib-default.patch (100%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0008-libgcc-disable-split-stack-nothreads.patch (100%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0009-bionic-ndk.patch (100%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0010-crystax.patch (97%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0011-crystax.patch (100%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0012-crystax.patch (98%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0013-crystax.patch (96%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0014-crystax.patch (100%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0015-crystax.patch (98%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0016-crystax.patch (100%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0017-crystax.patch (100%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0018-ARC-Add-multilib-support-for-linux-targets.patch (100%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0019-isl-0.20.patch (100%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0020-ARM-fix-cmse.patch (75%)
+ rename packages/gcc/{8.5.0 => 8.2.0}/0021-arm-Make-arm_cmse.h-C99-compatible.patch (79%)
+ create mode 100644 packages/gcc/8.2.0/chksum
+ rename packages/gcc/{8.5.0 => 8.2.0}/version.desc (100%)
+ delete mode 100644 packages/gcc/8.5.0/0022-ARC-Update-fma-expansions.patch
+ delete mode 100644 packages/gcc/8.5.0/chksum
+
+diff --git a/packages/gcc/8.5.0/0000-libtool-leave-framework-alone.patch b/packages/gcc/8.2.0/0000-libtool-leave-framework-alone.patch
+similarity index 100%
+rename from packages/gcc/8.5.0/0000-libtool-leave-framework-alone.patch
+rename to packages/gcc/8.2.0/0000-libtool-leave-framework-alone.patch
+diff --git a/packages/gcc/8.5.0/0001-uclibc-conf.patch b/packages/gcc/8.2.0/0001-uclibc-conf.patch
+similarity index 100%
+rename from packages/gcc/8.5.0/0001-uclibc-conf.patch
+rename to packages/gcc/8.2.0/0001-uclibc-conf.patch
+diff --git a/packages/gcc/8.5.0/0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch b/packages/gcc/8.2.0/0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
+similarity index 98%
+rename from packages/gcc/8.5.0/0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
+rename to packages/gcc/8.2.0/0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
+index 11cb9e07..20a88df3 100644
+--- a/packages/gcc/8.5.0/0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
++++ b/packages/gcc/8.2.0/0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
+@@ -53,7 +53,7 @@
+       if test x"$have_pic_shared" != x"yes" -o x"$ac_cv_search_dlopen" = x"no"; then
+ --- a/gcc/configure
+ +++ b/gcc/configure
+-@@ -29872,6 +29872,9 @@
++@@ -29805,6 +29805,9 @@
+     pluginlibs=
+     plugin_check=yes
+  
+@@ -63,7 +63,7 @@
+     case "${host}" in
+       *-*-mingw*)
+         # Since plugin support under MinGW is not as straightforward as on
+-@@ -29894,6 +29897,11 @@
++@@ -29827,6 +29830,11 @@
+  	 export_sym_check=
+         fi
+       ;;
+@@ -75,7 +75,7 @@
+       *)
+         if test x$build = x$host; then
+  	 export_sym_check="objdump${exeext} -T"
+-@@ -30006,23 +30014,23 @@
++@@ -29939,23 +29947,23 @@
+       case "${host}" in
+         *-*-darwin*)
+  	 CFLAGS=`echo $CFLAGS | sed s/-mdynamic-no-pic//g`
+diff --git a/packages/gcc/8.5.0/0003-gcc-plugin-POSIX-include-sys-select-h.patch b/packages/gcc/8.2.0/0003-gcc-plugin-POSIX-include-sys-select-h.patch
+similarity index 100%
+rename from packages/gcc/8.5.0/0003-gcc-plugin-POSIX-include-sys-select-h.patch
+rename to packages/gcc/8.2.0/0003-gcc-plugin-POSIX-include-sys-select-h.patch
+diff --git a/packages/gcc/8.5.0/0004-arm-softfloat-libgcc.patch b/packages/gcc/8.2.0/0004-arm-softfloat-libgcc.patch
+similarity index 100%
+rename from packages/gcc/8.5.0/0004-arm-softfloat-libgcc.patch
+rename to packages/gcc/8.2.0/0004-arm-softfloat-libgcc.patch
+diff --git a/packages/gcc/8.5.0/0005-fix-m68k-uclinux.patch b/packages/gcc/8.2.0/0005-fix-m68k-uclinux.patch
+similarity index 96%
+rename from packages/gcc/8.5.0/0005-fix-m68k-uclinux.patch
+rename to packages/gcc/8.2.0/0005-fix-m68k-uclinux.patch
+index 4dd32605..02b53bd8 100644
+--- a/packages/gcc/8.5.0/0005-fix-m68k-uclinux.patch
++++ b/packages/gcc/8.2.0/0005-fix-m68k-uclinux.patch
+@@ -10,7 +10,7 @@ Signed-off-by: Waldemar Brodkorb <wbx@openadk.org>
+ 
+ --- a/libgcc/config.host
+ +++ b/libgcc/config.host
+-@@ -857,7 +857,7 @@
++@@ -847,7 +847,7 @@
+  m68k*-*-openbsd*)
+  	;;
+  m68k-*-uclinux*)	# Motorola m68k/ColdFire running uClinux with uClibc
+diff --git a/packages/gcc/8.5.0/0006-libgfortran-missing-include.patch b/packages/gcc/8.2.0/0006-libgfortran-missing-include.patch
+similarity index 74%
+rename from packages/gcc/8.5.0/0006-libgfortran-missing-include.patch
+rename to packages/gcc/8.2.0/0006-libgfortran-missing-include.patch
+index 6e2e4e44..701e7b4f 100644
+--- a/packages/gcc/8.5.0/0006-libgfortran-missing-include.patch
++++ b/packages/gcc/8.2.0/0006-libgfortran-missing-include.patch
+@@ -4,10 +4,10 @@
+ 
+ --- a/libgfortran/io/close.c
+ +++ b/libgfortran/io/close.c
+-@@ -28,6 +28,7 @@
+- #if !HAVE_UNLINK_OPEN_FILE
+- #include <string.h>
+- #endif
++@@ -25,6 +25,7 @@
++ #include "io.h"
++ #include "unix.h"
++ #include <limits.h>
+ +#include <stdlib.h>
+  
+  typedef enum
+diff --git a/packages/gcc/8.5.0/0007-nios2-bad-multilib-default.patch b/packages/gcc/8.2.0/0007-nios2-bad-multilib-default.patch
+similarity index 100%
+rename from packages/gcc/8.5.0/0007-nios2-bad-multilib-default.patch
+rename to packages/gcc/8.2.0/0007-nios2-bad-multilib-default.patch
+diff --git a/packages/gcc/8.5.0/0008-libgcc-disable-split-stack-nothreads.patch b/packages/gcc/8.2.0/0008-libgcc-disable-split-stack-nothreads.patch
+similarity index 100%
+rename from packages/gcc/8.5.0/0008-libgcc-disable-split-stack-nothreads.patch
+rename to packages/gcc/8.2.0/0008-libgcc-disable-split-stack-nothreads.patch
+diff --git a/packages/gcc/8.5.0/0009-bionic-ndk.patch b/packages/gcc/8.2.0/0009-bionic-ndk.patch
+similarity index 100%
+rename from packages/gcc/8.5.0/0009-bionic-ndk.patch
+rename to packages/gcc/8.2.0/0009-bionic-ndk.patch
+diff --git a/packages/gcc/8.5.0/0010-crystax.patch b/packages/gcc/8.2.0/0010-crystax.patch
+similarity index 97%
+rename from packages/gcc/8.5.0/0010-crystax.patch
+rename to packages/gcc/8.2.0/0010-crystax.patch
+index ab6c01e5..0db3b69b 100644
+--- a/packages/gcc/8.5.0/0010-crystax.patch
++++ b/packages/gcc/8.2.0/0010-crystax.patch
+@@ -30,10 +30,6 @@ Date:   Wed Jul 29 11:28:29 2015 +0300
+  libstdc++-v3/include/bits/locale_facets.h  |   18 +++++++-
+  libstdc++-v3/libsupc++/guard.cc            |    5 ++
+  21 files changed, 235 insertions(+), 20 deletions(-)
+- create mode 100644 gcc/config/aarch64/aarch64-linux-android.h
+- create mode 100644 gcc/config/mips/android.h
+- create mode 100644 gcc/config/mips/t-linux-android
+- create mode 100644 gcc/config/mips/t-linux-android64
+ 
+ --- a/gcc/config.gcc
+ +++ b/gcc/config.gcc
+@@ -57,7 +53,7 @@ Date:   Wed Jul 29 11:28:29 2015 +0300
+  	esac
+  	aarch64_multilibs="${with_multilib_list}"
+  	if test "$aarch64_multilibs" = "default"; then
+-@@ -2142,6 +2146,17 @@
++@@ -2130,6 +2134,17 @@
+  	tm_file="dbxelf.h elfos.h gnu-user.h linux.h linux-android.h glibc-stdint.h ${tm_file} mips/gnu-user.h mips/linux.h mips/linux-common.h"
+  	extra_options="${extra_options} linux-android.opt"
+  	case ${target} in
+@@ -172,7 +168,7 @@ Date:   Wed Jul 29 11:28:29 2015 +0300
+        : min >= -256 && max < 256					\
+ --- a/gcc/config/arm/arm.md
+ +++ b/gcc/config/arm/arm.md
+-@@ -8698,7 +8698,7 @@
++@@ -8640,7 +8640,7 @@
+     (match_operand:SI 2 "const_int_operand" "")	; total range
+     (match_operand:SI 3 "" "")			; table label
+     (match_operand:SI 4 "" "")]			; Out of range label
+@@ -258,8 +254,8 @@ Date:   Wed Jul 29 11:28:29 2015 +0300
+ +
+  #undef  ASM_SPEC
+  #define ASM_SPEC \
+--  "--32 %{msse2avx:%{!mavx:-msse2avx}}"
+-+  "--32 %{msse2avx:%{!mavx:-msse2avx}} " \
++-  "--32 %{!mno-sse2avx:%{mavx:-msse2avx}} %{msse2avx:%{!mavx:-msse2avx}}"
+++  "--32 %{!mno-sse2avx:%{mavx:-msse2avx}} %{msse2avx:%{!mavx:-msse2avx}} " \
+ +  LINUX_OR_ANDROID_CC ("", ANDROID_ASM_SPEC)
+  
+  #undef  SUBTARGET_EXTRA_SPECS
+@@ -450,7 +446,7 @@ Date:   Wed Jul 29 11:28:29 2015 +0300
+  #if ((defined(_LIBOBJC) || defined(_LIBOBJC_WEAK)) \
+ --- a/libstdc++-v3/configure
+ +++ b/libstdc++-v3/configure
+-@@ -78672,6 +78672,18 @@
++@@ -78491,6 +78491,18 @@
+  /* end confdefs.h.  */
+  #include <sys/syscall.h>
+  	   int lk;
+@@ -492,16 +488,16 @@ Date:   Wed Jul 29 11:28:29 2015 +0300
+  namespace std _GLIBCXX_VISIBILITY(default)
+  {
+  _GLIBCXX_BEGIN_NAMESPACE_VERSION
+-@@ -1104,7 +1118,7 @@
++@@ -1102,7 +1116,7 @@
+         *  @return  @a __hi.
+        */
+        virtual const char*
+ -      do_widen(const char* __lo, const char* __hi, char_type* __to) const
+ +      do_widen(const char* __lo, const char* __hi, char_type* __to) const __CRYSTAX_X86_DONT_OPTIMIZE
+        {
+- 	if (__builtin_expect(__hi != __lo, true))
+- 	  __builtin_memcpy(__to, __lo, __hi - __lo);
+-@@ -1167,7 +1181,7 @@
++ 	__builtin_memcpy(__to, __lo, __hi - __lo);
++ 	return __hi;
++@@ -1163,7 +1177,7 @@
+  
+      private:
+        void _M_narrow_init() const;
+diff --git a/packages/gcc/8.5.0/0011-crystax.patch b/packages/gcc/8.2.0/0011-crystax.patch
+similarity index 100%
+rename from packages/gcc/8.5.0/0011-crystax.patch
+rename to packages/gcc/8.2.0/0011-crystax.patch
+diff --git a/packages/gcc/8.5.0/0012-crystax.patch b/packages/gcc/8.2.0/0012-crystax.patch
+similarity index 98%
+rename from packages/gcc/8.5.0/0012-crystax.patch
+rename to packages/gcc/8.2.0/0012-crystax.patch
+index 332e59f8..2bf6cc76 100644
+--- a/packages/gcc/8.5.0/0012-crystax.patch
++++ b/packages/gcc/8.2.0/0012-crystax.patch
+@@ -26,7 +26,7 @@ Date:   Mon Apr 14 15:59:47 2014 -0700
+ 
+ --- a/gcc/config.in
+ +++ b/gcc/config.in
+-@@ -2233,6 +2233,12 @@
++@@ -2219,6 +2219,12 @@
+  #endif
+  
+  
+@@ -127,7 +127,7 @@ Date:   Mon Apr 14 15:59:47 2014 -0700
+  
+ --- a/gcc/configure
+ +++ b/gcc/configure
+-@@ -944,6 +944,7 @@
++@@ -943,6 +943,7 @@
+  enable_fix_cortex_a53_843419
+  with_glibc_version
+  enable_gnu_unique_object
+@@ -135,7 +135,7 @@ Date:   Mon Apr 14 15:59:47 2014 -0700
+  enable_linker_build_id
+  enable_libssp
+  enable_default_ssp
+-@@ -1685,6 +1686,9 @@
++@@ -1684,6 +1685,9 @@
+    --enable-gnu-unique-object
+                            enable the use of the @gnu_unique_object ELF
+                            extension on glibc systems
+@@ -145,7 +145,7 @@ Date:   Mon Apr 14 15:59:47 2014 -0700
+    --enable-linker-build-id
+                            compiler will always pass --build-id to linker
+    --enable-libssp         enable linking against libssp
+-@@ -28383,6 +28387,38 @@
++@@ -28319,6 +28323,38 @@
+  
+  $as_echo "#define HAVE_LD_EH_FRAME_HDR 1" >>confdefs.h
+  
+@@ -186,7 +186,7 @@ Date:   Mon Apr 14 15:59:47 2014 -0700
+  $as_echo "$gcc_cv_ld_eh_frame_hdr" >&6; }
+ --- a/gcc/configure.ac
+ +++ b/gcc/configure.ac
+-@@ -5147,6 +5147,35 @@
++@@ -5140,6 +5140,35 @@
+  if test x"$gcc_cv_ld_eh_frame_hdr" = xyes; then
+  	AC_DEFINE(HAVE_LD_EH_FRAME_HDR, 1,
+  [Define if your linker supports .eh_frame_hdr.])
+diff --git a/packages/gcc/8.5.0/0013-crystax.patch b/packages/gcc/8.2.0/0013-crystax.patch
+similarity index 96%
+rename from packages/gcc/8.5.0/0013-crystax.patch
+rename to packages/gcc/8.2.0/0013-crystax.patch
+index c6957987..3b9347a5 100644
+--- a/packages/gcc/8.5.0/0013-crystax.patch
++++ b/packages/gcc/8.2.0/0013-crystax.patch
+@@ -12,7 +12,7 @@ Date:   Thu Aug 20 19:11:07 2015 +0300
+ 
+ --- a/gcc/config/i386/i386.c
+ +++ b/gcc/config/i386/i386.c
+-@@ -15895,6 +15895,7 @@
++@@ -15916,6 +15916,7 @@
+  	  else if (!SYMBOL_REF_FAR_ADDR_P (op0)
+  		   && (SYMBOL_REF_LOCAL_P (op0)
+  		       || (HAVE_LD_PIE_COPYRELOC
+diff --git a/packages/gcc/8.5.0/0014-crystax.patch b/packages/gcc/8.2.0/0014-crystax.patch
+similarity index 100%
+rename from packages/gcc/8.5.0/0014-crystax.patch
+rename to packages/gcc/8.2.0/0014-crystax.patch
+diff --git a/packages/gcc/8.5.0/0015-crystax.patch b/packages/gcc/8.2.0/0015-crystax.patch
+similarity index 98%
+rename from packages/gcc/8.5.0/0015-crystax.patch
+rename to packages/gcc/8.2.0/0015-crystax.patch
+index d62a57b2..05d67f90 100644
+--- a/packages/gcc/8.5.0/0015-crystax.patch
++++ b/packages/gcc/8.2.0/0015-crystax.patch
+@@ -15,7 +15,7 @@ Date:   Mon Apr 14 21:05:51 2014 -0700
+ 
+ --- a/gcc/config/arm/arm.c
+ +++ b/gcc/config/arm/arm.c
+-@@ -22671,9 +22671,13 @@
++@@ -22608,9 +22608,13 @@
+  	memsize = MEM_SIZE (x);
+  
+  	/* Only certain alignment specifiers are supported by the hardware.  */
+diff --git a/packages/gcc/8.5.0/0016-crystax.patch b/packages/gcc/8.2.0/0016-crystax.patch
+similarity index 100%
+rename from packages/gcc/8.5.0/0016-crystax.patch
+rename to packages/gcc/8.2.0/0016-crystax.patch
+diff --git a/packages/gcc/8.5.0/0017-crystax.patch b/packages/gcc/8.2.0/0017-crystax.patch
+similarity index 100%
+rename from packages/gcc/8.5.0/0017-crystax.patch
+rename to packages/gcc/8.2.0/0017-crystax.patch
+diff --git a/packages/gcc/8.5.0/0018-ARC-Add-multilib-support-for-linux-targets.patch b/packages/gcc/8.2.0/0018-ARC-Add-multilib-support-for-linux-targets.patch
+similarity index 100%
+rename from packages/gcc/8.5.0/0018-ARC-Add-multilib-support-for-linux-targets.patch
+rename to packages/gcc/8.2.0/0018-ARC-Add-multilib-support-for-linux-targets.patch
+diff --git a/packages/gcc/8.5.0/0019-isl-0.20.patch b/packages/gcc/8.2.0/0019-isl-0.20.patch
+similarity index 100%
+rename from packages/gcc/8.5.0/0019-isl-0.20.patch
+rename to packages/gcc/8.2.0/0019-isl-0.20.patch
+diff --git a/packages/gcc/8.5.0/0020-ARM-fix-cmse.patch b/packages/gcc/8.2.0/0020-ARM-fix-cmse.patch
+similarity index 75%
+rename from packages/gcc/8.5.0/0020-ARM-fix-cmse.patch
+rename to packages/gcc/8.2.0/0020-ARM-fix-cmse.patch
+index cf2d2431..4a501a27 100644
+--- a/packages/gcc/8.5.0/0020-ARM-fix-cmse.patch
++++ b/packages/gcc/8.2.0/0020-ARM-fix-cmse.patch
+@@ -13,13 +13,15 @@ Subject: [PATCH] 2018-05-17  Jerome Lambourg  <lambourg@adacore.com>
+ 
+ git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@260330 138bc75d-0d04-0410-961f-82ee72b054a4
+ ---
+- gcc/config/arm/arm_cmse.h |    5 ++---
+- libgcc/config/arm/cmse.c  |    5 +++--
+- 2 files changed, 5 insertions(+), 5 deletions(-)
++ gcc/config/arm/arm_cmse.h | 5 ++---
++ libgcc/config/arm/cmse.c  | 5 +++--
++ 4 files changed, 15 insertions(+), 5 deletions(-)
+ 
++diff --git a/gcc/config/arm/arm_cmse.h b/gcc/config/arm/arm_cmse.h
++index 367e212dc9c..f972e23659d 100644
+ --- a/gcc/config/arm/arm_cmse.h
+ +++ b/gcc/config/arm/arm_cmse.h
+-@@ -35,7 +35,6 @@
++@@ -35,7 +35,6 @@ extern "C" {
+  #if __ARM_FEATURE_CMSE & 1
+  
+  #include <stddef.h>
+@@ -27,7 +29,7 @@ git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@260330 138bc75d-0d04-0410-961f-8
+  
+  #ifdef __ARM_BIG_ENDIAN
+  
+-@@ -174,9 +173,9 @@
++@@ -174,9 +173,9 @@ cmse_nonsecure_caller (void)
+  #define CMSE_MPU_NONSECURE	16
+  #define CMSE_NONSECURE		18
+  
+@@ -39,9 +41,11 @@ git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@260330 138bc75d-0d04-0410-961f-8
+  
+  #endif /* __ARM_FEATURE_CMSE & 2 */
+  
++diff --git a/libgcc/config/arm/cmse.c b/libgcc/config/arm/cmse.c
++index 3ded385693a..2ad0af2ecd8 100644
+ --- a/libgcc/config/arm/cmse.c
+ +++ b/libgcc/config/arm/cmse.c
+-@@ -36,7 +36,7 @@
++@@ -36,7 +36,7 @@ cmse_check_address_range (void *p, size_t size, int flags)
+    char *pb = (char *) p, *pe;
+  
+    /* Check if the range wraps around.  */
+@@ -50,7 +54,7 @@ git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@260330 138bc75d-0d04-0410-961f-8
+      return NULL;
+  
+    /* Check if an unknown flag is present.  */
+-@@ -51,7 +51,8 @@
++@@ -51,7 +51,8 @@ cmse_check_address_range (void *p, size_t size, int flags)
+  
+    /* Execute the right variant of the TT instructions.  */
+    pe = pb + size - 1;
+@@ -60,3 +64,6 @@ git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@260330 138bc75d-0d04-0410-961f-8
+    switch (flags & known_secure_level)
+      {
+      case 0:
++-- 
++2.14.4
++
+diff --git a/packages/gcc/8.5.0/0021-arm-Make-arm_cmse.h-C99-compatible.patch b/packages/gcc/8.2.0/0021-arm-Make-arm_cmse.h-C99-compatible.patch
+similarity index 79%
+rename from packages/gcc/8.5.0/0021-arm-Make-arm_cmse.h-C99-compatible.patch
+rename to packages/gcc/8.2.0/0021-arm-Make-arm_cmse.h-C99-compatible.patch
+index afdc1a53..09899107 100644
+--- a/packages/gcc/8.5.0/0021-arm-Make-arm_cmse.h-C99-compatible.patch
++++ b/packages/gcc/8.2.0/0021-arm-Make-arm_cmse.h-C99-compatible.patch
+@@ -12,13 +12,15 @@ gcc/ChangeLog
+ 
+ git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@261204 138bc75d-0d04-0410-961f-82ee72b054a4
+ ---
+- gcc/config/arm/arm_cmse.h |    4 ++--
+- 1 file changed, 2 insertions(+), 2 deletions(-)
++ gcc/config/arm/arm_cmse.h                     | 4 ++--
++ 4 files changed, 16 insertions(+), 2 deletions(-)
+  create mode 100644 gcc/testsuite/gcc.target/arm/cmse/cmse-1c99.c
+ 
++diff --git a/gcc/config/arm/arm_cmse.h b/gcc/config/arm/arm_cmse.h
++index f972e23659d..9b35537cd33 100644
+ --- a/gcc/config/arm/arm_cmse.h
+ +++ b/gcc/config/arm/arm_cmse.h
+-@@ -173,7 +173,7 @@
++@@ -173,7 +173,7 @@ cmse_nonsecure_caller (void)
+  #define CMSE_MPU_NONSECURE	16
+  #define CMSE_NONSECURE		18
+  
+@@ -27,7 +29,7 @@ git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@261204 138bc75d-0d04-0410-961f-8
+  
+  #define cmse_is_nsfptr(p) (!((__INTPTR_TYPE__) (p) & 1))
+  
+-@@ -187,7 +187,7 @@
++@@ -187,7 +187,7 @@ __extension__ void *
+  cmse_check_address_range (void *, size_t, int);
+  
+  #define cmse_check_pointed_object(p, f) \
+diff --git a/packages/gcc/8.2.0/chksum b/packages/gcc/8.2.0/chksum
+new file mode 100644
+index 00000000..2035f371
+--- /dev/null
++++ b/packages/gcc/8.2.0/chksum
+@@ -0,0 +1,8 @@
++md5 gcc-8.2.0.tar.xz 4ab282f414676496483b3e1793d07862
++sha1 gcc-8.2.0.tar.xz 19926bdb6c4b58891015929853d41aeff019d400
++sha256 gcc-8.2.0.tar.xz 196c3c04ba2613f893283977e6011b2345d1cd1af9abeac58e916b1aab3e0080
++sha512 gcc-8.2.0.tar.xz 64898a165f67e136d802a92e7633bf1b06c85266027e52127ea025bf5fc2291b5e858288aac0bdba246e6cdf7c6ec88bc8e0e7f3f6f1985f4297710cafde56ed
++md5 gcc-8.2.0.tar.gz ee04f0c22a941f5f17d93809387f2729
++sha1 gcc-8.2.0.tar.gz 3895bb765c2ceecccd6dee86467f6d1bb1994cbd
++sha256 gcc-8.2.0.tar.gz 1b0f36be1045ff58cbb9c83743835367b860810f17f0195a4e093458b372020f
++sha512 gcc-8.2.0.tar.gz 3182cd248a37ce4c36ad2a43f1910da13325452472ea80855afc21f134c4e4792c29887f5e070fe21c3ff8e5953e59f69343e1d3b968ee1eb2d8b5c8ae9f48fa
+diff --git a/packages/gcc/8.5.0/version.desc b/packages/gcc/8.2.0/version.desc
+similarity index 100%
+rename from packages/gcc/8.5.0/version.desc
+rename to packages/gcc/8.2.0/version.desc
+diff --git a/packages/gcc/8.5.0/0022-ARC-Update-fma-expansions.patch b/packages/gcc/8.5.0/0022-ARC-Update-fma-expansions.patch
+deleted file mode 100644
+index 380618fc..00000000
+--- a/packages/gcc/8.5.0/0022-ARC-Update-fma-expansions.patch
++++ /dev/null
+@@ -1,63 +0,0 @@
+-From 5664ecf49828edb20f53937ab2e417ba173fc903 Mon Sep 17 00:00:00 2001
+-From: claziss <claziss@138bc75d-0d04-0410-961f-82ee72b054a4>
+-Date: Wed, 13 Jun 2018 08:54:09 +0000
+-Subject: [PATCH] [ARC] Update fma expansions.
+-
+-Accept at most a single constant for fma patterns.
+-
+-gcc/
+-2018-03-21  Claudiu Zissulescu  <claziss@synopsys.com>
+-
+-	* config/arc/fpu.md (fmasf4): Force operand to register.
+-	(fnmasf4): Likewise.
+-
+-gcc/testsuite
+-2018-03-21  Claudiu Zissulescu  <claziss@synopsys.com>
+-
+-	* gcc.target/arc/fma-1.c: New test.
+-
+-git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@261543 138bc75d-0d04-0410-961f-82ee72b054a4
+----
+- gcc/config/arc/fpu.md                |    6 ++++++
+- gcc/testsuite/gcc.target/arc/fma-1.c |   13 +++++++++++++
+- 2 files changed, 19 insertions(+)
+- create mode 100644 gcc/testsuite/gcc.target/arc/fma-1.c
+-
+---- a/gcc/config/arc/fpu.md
+-+++ b/gcc/config/arc/fpu.md
+-@@ -64,6 +64,9 @@
+-    tmp = gen_rtx_REG (SFmode, ACCL_REGNO);
+-    emit_move_insn (tmp, operands[3]);
+-    operands[3] = tmp;
+-+   if (!register_operand (operands[1], SFmode)
+-+        && !register_operand (operands[2], SFmode))
+-+     operands[2] = force_reg (SFmode, operands[2]);
+-    }")
+- 
+- (define_expand "fnmasf4"
+-@@ -77,6 +80,9 @@
+-    tmp = gen_rtx_REG (SFmode, ACCL_REGNO);
+-    emit_move_insn (tmp, operands[3]);
+-    operands[3] = tmp;
+-+   if (!register_operand (operands[1], SFmode)
+-+        && !register_operand (operands[2], SFmode))
+-+     operands[2] = force_reg (SFmode, operands[2]);
+- }")
+- 
+- (define_insn "fmasf4_fpu"
+---- /dev/null
+-+++ b/gcc/testsuite/gcc.target/arc/fma-1.c
+-@@ -0,0 +1,13 @@
+-+/* { dg-do compile } */
+-+/* { dg-skip-if "FPU not available" { arc700 || arc6xx } } */
+-+/* { dg-options "-s -std=gnu11  -O2 -frounding-math -mfpu=fpus_all" } */
+-+
+-+const float a, b = 7.8539818525e01;
+-+
+-+/* Check if the fma operation is generated correctly.  */
+-+
+-+int foo (void)
+-+{
+-+  return (float)3.0 * b + a;
+-+}
+-+/* { dg-final { scan-assembler "fsmadd" } } */
+diff --git a/packages/gcc/8.5.0/chksum b/packages/gcc/8.5.0/chksum
+deleted file mode 100644
+index ff66ea00..00000000
+--- a/packages/gcc/8.5.0/chksum
++++ /dev/null
+@@ -1,8 +0,0 @@
+-md5 gcc-8.5.0.tar.xz 0c1f625768840187ef3b10adebe8e3b0
+-sha1 gcc-8.5.0.tar.xz 2e93f85672f57023d45c20fef9572b72f8a3e7f1
+-sha256 gcc-8.5.0.tar.xz d308841a511bb830a6100397b0042db24ce11f642dab6ea6ee44842e5325ed50
+-sha512 gcc-8.5.0.tar.xz 92f599680e6b7fbce88bcdda810f468777d541e5fddfbb287f7977d51093de2a5178bd0e6a08dfe37090ea10a0508a43ccd00220041abbbec33f1179bfc174d8
+-md5 gcc-8.5.0.tar.gz f2828337b83328c620433f0e3a745c9d
+-sha1 gcc-8.5.0.tar.gz 212ce514887e342b4cd136d5967f111a88396b7f
+-sha256 gcc-8.5.0.tar.gz 6e6e0628573d2185727a2dd83211d04a2b2748e4a262099099b9c8064634c9ee
+-sha512 gcc-8.5.0.tar.gz 2e97b09dda8d8a432da2e8542243df3e8f3e86df8135ce4163ef7e7067ecd756543db5dc3231b905527ee3e370b3bcc1c36085f45ebc8c946f3a391985ef85ce
+-- 
+2.30.2
+
