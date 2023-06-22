@@ -8,5 +8,10 @@ set(CMAKE_C_COMPILER /usr/local/bin/clang-wasi-sysroot.sh)
 set(CMAKE_CXX_COMPILER /usr/local/bin/clang++-wasi-sysroot.sh)
 set(CMAKE_AR llvm-ar-$ENV{LLVM_VERSION})
 set(CMAKE_RANLIB llvm-ranlib-$ENV{LLVM_VERSION})
+set(CMAKE_ASM_COMPILER clang-$ENV{LLVM_VERSION})
+
+set(CMAKE_C_COMPILER_TARGET $ENV{CROSS_TRIPLE})
+set(CMAKE_CXX_COMPILER_TARGET $ENV{CROSS_TRIPLE})
+set(CMAKE_ASM_COMPILER_TARGET $ENV{CROSS_TRIPLE})
 
 set(CMAKE_CROSSCOMPILING_EMULATOR /wasi-runtimes/wasmtime/bin/wasmtime-pwd.sh)

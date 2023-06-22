@@ -3,16 +3,7 @@ FROM ${ORG}/base:latest
 
 LABEL maintainer="Matt McCormick matt.mccormick@kitware.com"
 
-ENV WASI_VERSION 19
-ENV WASI_VERSION_FULL ${WASI_VERSION}.0
-RUN cd /usr/ && \
-  curl -L -O https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_VERSION}/wasi-sdk-${WASI_VERSION_FULL}-linux.tar.gz && \
-  tar xvzf wasi-sdk-${WASI_VERSION_FULL}-linux.tar.gz && \
-  rm wasi-sdk-${WASI_VERSION_FULL}-linux.tar.gz
-ENV WASI_SYSROOT /usr/wasi-sdk-${WASI_VERSION_FULL}/share/wasi-sysroot
-ENV WASI_SDK_PATH /usr/wasi-sdk-${WASI_VERSION_FULL}
-
-ENV LLVM_VERSION 15
+ENV LLVM_VERSION 16
 
 # Build LLVM / Clang that supports our glibc
 RUN apt-get update && \
@@ -27,14 +18,19 @@ RUN apt-get update && \
     apt-get install -y clang-${LLVM_VERSION} lld-${LLVM_VERSION} && \
     rm -rf /var/lib/apt/lists/*
 
-# The path to the rt directory contains the LLVM patch version which is not reflected in the LLVM apt repository
-# or package. To make adding the RT robust to changing patch versions without needing to duplicate the folder
-# content, we copy after extracting using a bash glob to resolve the patch version
+ENV WASI_VERSION 20
+ENV WASI_VERSION_FULL ${WASI_VERSION}.0
+RUN cd /usr/ && \
+  curl -L -O https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_VERSION}/wasi-sdk-${WASI_VERSION_FULL}-linux.tar.gz && \
+  tar xvzf wasi-sdk-${WASI_VERSION_FULL}-linux.tar.gz && \
+  rm wasi-sdk-${WASI_VERSION_FULL}-linux.tar.gz
 RUN cd /usr/ && \
   curl -L -O https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_VERSION}/libclang_rt.builtins-wasm32-wasi-${WASI_VERSION_FULL}.tar.gz && \
   tar xvzf libclang_rt.builtins-wasm32-wasi-${WASI_VERSION_FULL}.tar.gz && \
   rm libclang_rt.builtins-wasm32-wasi-${WASI_VERSION_FULL}.tar.gz && \
-  ln -s /usr/lib/wasi/ $(echo /usr/lib/llvm-${LLVM_VERSION}/lib/clang/${LLVM_VERSION}.*)/lib/wasi
+  cp -r lib/wasi /usr/lib/llvm-${LLVM_VERSION}/lib/clang/${LLVM_VERSION}/lib/
+ENV WASI_SYSROOT /usr/wasi-sdk-${WASI_VERSION_FULL}/share/wasi-sysroot
+ENV WASI_SDK_PATH /usr/wasi-sdk-${WASI_VERSION_FULL}
 
 COPY clang-wasi-sysroot.sh clang++-wasi-sysroot.sh /usr/local/bin/
 
