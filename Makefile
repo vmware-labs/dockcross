@@ -4,7 +4,7 @@
 #
 
 # Name of the docker executable
-DOCKER = docker
+DOCKER := docker
 
 # Docker organization to pull the images from
 ORG = dockcross
@@ -13,7 +13,7 @@ ORG = dockcross
 BIN = ./bin
 
 # These images are built using the "build implicit rule"
-STANDARD_IMAGES = android-arm android-arm64 android-x86 android-x86_64 \
+STANDARD_IMAGES := android-arm android-arm64 android-x86 android-x86_64 \
 	linux-i686 linux-x86 linux-x64 linux-x64-clang linux-arm64 linux-arm64-musl linux-arm64-full \
 	linux-armv5 linux-armv5-musl linux-armv5-uclibc linux-m68k-uclibc linux-s390x linux-x64-tinycc \
 	linux-armv6 linux-armv6-lts linux-armv6-musl linux-arm64-lts linux-mipsel-lts \
@@ -25,7 +25,7 @@ STANDARD_IMAGES = android-arm android-arm64 android-x86 android-x86_64 \
 	bare-armv7emhf-nano_newlib
 
 # Generated Dockerfiles.
-GEN_IMAGES = android-arm android-arm64 \
+GEN_IMAGES := android-arm android-arm64 \
 	linux-i686 linux-x86 linux-x64 linux-x64-clang linux-arm64 linux-arm64-musl linux-arm64-full \
 	manylinux_2_28-x64 \
 	manylinux2014-x64 manylinux2014-x86 \
@@ -42,7 +42,7 @@ GEN_IMAGES = android-arm android-arm64 \
 GEN_IMAGE_DOCKERFILES = $(addsuffix /Dockerfile,$(GEN_IMAGES))
 
 # These images are expected to have explicit rules for *both* build and testing
-NON_STANDARD_IMAGES = manylinux_2_28-x64 manylinux2014-x64 manylinux2014-x86 \
+NON_STANDARD_IMAGES := manylinux_2_28-x64 manylinux2014-x64 manylinux2014-x86 \
 		      manylinux2014-aarch64 web-wasm
 
 # Docker composite files
@@ -53,7 +53,7 @@ DOCKER_COMPOSITE_FOLDER_PATH = common/
 DOCKER_COMPOSITE_PATH = $(addprefix $(DOCKER_COMPOSITE_FOLDER_PATH),$(DOCKER_COMPOSITE_SOURCES))
 
 # This list all available images
-IMAGES = $(STANDARD_IMAGES) $(NON_STANDARD_IMAGES)
+IMAGES := $(STANDARD_IMAGES) $(NON_STANDARD_IMAGES)
 
 # Optional arguments for test runner (test/run.py) associated with "testing implicit rule"
 linux-x64-tinycc.test_ARGS = --languages C
