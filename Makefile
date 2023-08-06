@@ -63,6 +63,8 @@ windows-static-x64-posix.test_ARGS = --exe-suffix ".exe"
 windows-shared-x86.test_ARGS = --exe-suffix ".exe"
 windows-shared-x64.test_ARGS = --exe-suffix ".exe"
 windows-shared-x64-posix.test_ARGS = --exe-suffix ".exe"
+windows-armv7.test_ARGS = --exe-suffix ".exe"
+windows-arm64.test_ARGS = --exe-suffix ".exe"
 bare-armv7emhf-nano_newlib.test_ARGS = --linker-flags="--specs=nosys.specs"
 
 # On CircleCI, do not attempt to delete container
