@@ -1,5 +1,6 @@
 ARG ORG=dockcross
-FROM ${ORG}/base:latest
+ARG VERSION=latest
+FROM ${ORG}/base:${VERSION}
 
 LABEL maintainer="CBC Linux #team-endpoint-linux"
 

@@ -1,0 +1,221 @@
+variables:
+  IMAGE_REF: ${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_ID}
+  REF_TAG_amd64: ${IMAGE_REF}-amd64
+  REF_TAG_arm64: ${IMAGE_REF}-arm64
+  DOCKER_REPO: artifactory-pub.bit9.local:5000
+  DOCKCROSS_ROOT_NAME: ${DOCKER_REPO}/cbdev/dockcross
+  BASE_IMAGE_NAME: ${DOCKCROSS_ROOT_NAME}/base
+
+image: ${DOCKER_REPO}/cbdev/ubuntu2004-docker:kk_arm_support
+
+stages:
+  - build
+
+before_script:
+  - |
+    # Pre Script
+    if [ "$GIT_STRATEGY" != "none" ]; then
+        git config --global url.https://gitlab.bit9.local/.insteadOf git@gitlab.bit9.local:
+        git config --global credential.helper '!function f { echo "username=$GIT_USER"; echo "password=$GIT_TOKEN"; }; f'
+
+        # If we have a clone for this job make sure we have the latest, and checkout the branch
+        #  We do not want to remain detached for the audit code
+        git branch -D $CI_COMMIT_REF_NAME &> /dev/null || true
+        git fetch --prune &> /dev/null || true
+        git checkout -B "$CI_BUILD_REF_NAME" "$CI_BUILD_REF"
+    fi
+  - docker login -u $SVC_GITLAB_USER_NAME -p $SVC_GITLAB_PASSWORD $DOCKER_REPO
+
+.build_script: &build_script |
+    # Build Script
+    echo "### Building ${TARGET}:${REF_TAG}"
+
+    TARGET_PATH=.
+
+    # If this is not the base we need to do some prep work
+    if [[ "${TARGET}" != "base" ]]; then
+        # Just in case this job is on a differnt pull the base image for this build
+        docker pull ${BASE_IMAGE_NAME}:${REF_TAG}
+
+        # This logic comes from dockcross/Makefile
+        TARGET_PATH=${TARGET}
+        mkdir -p ${TARGET_PATH}/imagefiles && cp -r imagefiles ${TARGET_PATH}/
+    fi
+
+    # I am only using the make to generate the Dockerfle
+    make ORG=${DOCKCROSS_ROOT_NAME} ${TARGET_PATH}/Dockerfile
+
+    IMAGE=${DOCKCROSS_ROOT_NAME}/${TARGET}
+
+    # Do the actual build.  This gives us better control of how it is built.
+    # TODO: I would like to have this use `docker buildx` instead.  Right now the method I am using
+    #       to create the multi-arch docker manifest is the the approved approach.  Unfortunatly I
+    #       am blocked by 
+    docker build \
+        -t ${IMAGE}:${REF_TAG} \
+        --build-arg ORG=${DOCKCROSS_ROOT_NAME} \
+        --build-arg IMAGE=${IMAGE} \
+        --build-arg VERSION=${REF_TAG} \
+        --build-arg VCS_REF=${CI_COMMIT_SHORT_SHA} \
+        --build-arg VCS_URL="git@github.com:vmware-labs/dockcross.git" \
+        --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+        ${TARGET_PATH}
+    rm -rf ${TARGET_PATH}/imagefiles
+
+    # We need to push the image so it is available to later jobs.
+    # Note: We are only pushing the REF_TAG image.  The branch and latest images
+    #       will be pushed later.
+    docker push ${IMAGE}:${REF_TAG}
+
+# BEGIN: Rules to build the base image
+
+.build_template:
+  stage: build
+  when: on_success
+  retry: 2
+  script:
+    - *build_script
+
+build:base:amd64:
+  extends: .build_template
+  when: always
+  variables:
+    TARGET: base
+    REF_TAG: ${REF_TAG_amd64}
+
+build:base:arm64:
+  extends: .build_template
+  when: always
+  tags:
+    - aarch64
+  variables:
+    TARGET: base
+    REF_TAG: ${REF_TAG_arm64}
+
+# END: Rules to build the base image
+
+
+# BEGIN: Template rules to build the toolchain images
+
+# Template to build amd64 tools
+.build_amd64_template:
+  extends: .build_template
+  needs:
+    - job: build:base:amd64
+
+# Template to build arm64 tools
+.build_arm64_template:
+  extends: .build_template
+  needs:
+    - job: build:base:arm64
+  tags:
+    - aarch64
+
+# END: Template rules to build the toolchain images
+
+# BEGIN: Rules to build the toolchain images
+
+build:linux-x86_64-gcc11_2:amd64:
+  extends: .build_amd64_template
+  variables:
+    TARGET: linux-x86_64-gcc11_2
+    REF_TAG: ${REF_TAG_amd64}
+
+build:linux-arm64-gcc8_2:amd64:
+  extends: .build_amd64_template
+  variables:
+    TARGET: linux-arm64-gcc8_2
+    REF_TAG: ${REF_TAG_amd64}
+
+build:linux-x86_64-gcc11_2:arm64:
+  extends: .build_arm64_template
+  variables:
+    TARGET: linux-x86_64-gcc11_2
+    REF_TAG: ${REF_TAG_arm64}
+
+build:linux-arm64-gcc8_2:arm64:
+  extends: .build_arm64_template
+  variables:
+    TARGET: linux-arm64-gcc8_2
+    REF_TAG: ${REF_TAG_arm64}
+
+# END: Rules to build the toolchain images
+
+# BEGIN: Manifest generation
+
+build:manifest:
+  stage: build
+  when: on_success
+  needs:
+    - job: build:linux-x86_64-gcc11_2:amd64
+    - job: build:linux-arm64-gcc8_2:amd64
+    - job: build:linux-x86_64-gcc11_2:arm64
+    - job: build:linux-arm64-gcc8_2:arm64
+  variables:
+    REF_TAG: ${IMAGE_REF}
+  script: |
+    # This logic uses the experimental docker commands.
+    # See: https://docs.docker.com/engine/reference/commandline/manifest/
+
+    set -x
+
+    ## BEGIN: base image manifest creation
+    # REF_TAG
+    docker manifest create ${DOCKCROSS_ROOT_NAME}/base:${REF_TAG} \
+      --amend ${DOCKCROSS_ROOT_NAME}/base:${REF_TAG_amd64} \
+      --amend ${DOCKCROSS_ROOT_NAME}/base:${REF_TAG_arm64}
+    docker manifest push --purge ${DOCKCROSS_ROOT_NAME}/base:${REF_TAG}
+
+    # BRANCH_TAG
+    docker manifest create ${DOCKCROSS_ROOT_NAME}/base:${CI_COMMIT_REF_NAME} \
+      --amend ${DOCKCROSS_ROOT_NAME}/base:${REF_TAG_amd64} \
+      --amend ${DOCKCROSS_ROOT_NAME}/base:${REF_TAG_amd64}
+    docker manifest push --purge ${DOCKCROSS_ROOT_NAME}/base:${CI_COMMIT_REF_NAME}
+
+    # latest
+    docker manifest create ${DOCKCROSS_ROOT_NAME}/base:latest \
+      --amend ${DOCKCROSS_ROOT_NAME}/base:${REF_TAG_amd64} \
+      --amend ${DOCKCROSS_ROOT_NAME}/base:${REF_TAG_arm64}
+    docker manifest push --purge ${DOCKCROSS_ROOT_NAME}/base:latest
+
+
+    ## BEGIN: linux-x86_64-gcc11_2 image manifest creation
+    # REF_TAG
+    docker manifest create ${DOCKCROSS_ROOT_NAME}/linux-x86_64-gcc11_2:${REF_TAG} \
+      --amend ${DOCKCROSS_ROOT_NAME}/linux-x86_64-gcc11_2:${REF_TAG_amd64} \
+      --amend ${DOCKCROSS_ROOT_NAME}/linux-x86_64-gcc11_2:${REF_TAG_arm64}
+    docker manifest push --purge ${DOCKCROSS_ROOT_NAME}/linux-x86_64-gcc11_2:${REF_TAG}
+
+    # BRANCH_TAG
+    docker manifest create ${DOCKCROSS_ROOT_NAME}/linux-x86_64-gcc11_2:${CI_COMMIT_REF_NAME} \
+      --amend ${DOCKCROSS_ROOT_NAME}/linux-x86_64-gcc11_2:${REF_TAG_amd64} \
+      --amend ${DOCKCROSS_ROOT_NAME}/linux-x86_64-gcc11_2:${REF_TAG_amd64}
+    docker manifest push --purge ${DOCKCROSS_ROOT_NAME}/linux-x86_64-gcc11_2:${CI_COMMIT_REF_NAME}
+
+    # latest
+    docker manifest create ${DOCKCROSS_ROOT_NAME}/linux-x86_64-gcc11_2:latest \
+      --amend ${DOCKCROSS_ROOT_NAME}/linux-x86_64-gcc11_2:${REF_TAG_amd64} \
+      --amend ${DOCKCROSS_ROOT_NAME}/linux-x86_64-gcc11_2:${REF_TAG_arm64}
+    docker manifest push --purge ${DOCKCROSS_ROOT_NAME}/linux-x86_64-gcc11_2:latest
+
+
+    ## BEGIN: linux-arm64-gcc8_2 image manifest creation
+    # REF_TAG
+    docker manifest create ${DOCKCROSS_ROOT_NAME}/linux-arm64-gcc8_2:${REF_TAG} \
+      --amend ${DOCKCROSS_ROOT_NAME}/linux-arm64-gcc8_2:${REF_TAG_amd64} \
+      --amend ${DOCKCROSS_ROOT_NAME}/linux-arm64-gcc8_2:${REF_TAG_arm64}
+    docker manifest push --purge ${DOCKCROSS_ROOT_NAME}/linux-arm64-gcc8_2:${REF_TAG}
+
+    # BRANCH_TAG
+    docker manifest create ${DOCKCROSS_ROOT_NAME}/linux-arm64-gcc8_2:${CI_COMMIT_REF_NAME} \
+      --amend ${DOCKCROSS_ROOT_NAME}/linux-arm64-gcc8_2:${REF_TAG_amd64} \
+      --amend ${DOCKCROSS_ROOT_NAME}/linux-arm64-gcc8_2:${REF_TAG_amd64}
+    docker manifest push --purge ${DOCKCROSS_ROOT_NAME}/linux-arm64-gcc8_2:${CI_COMMIT_REF_NAME}
+
+    # latest
+    docker manifest create ${DOCKCROSS_ROOT_NAME}/linux-arm64-gcc8_2:latest \
+      --amend ${DOCKCROSS_ROOT_NAME}/linux-arm64-gcc8_2:${REF_TAG_amd64} \
+      --amend ${DOCKCROSS_ROOT_NAME}/linux-arm64-gcc8_2:${REF_TAG_arm64}
+    docker manifest push --purge ${DOCKCROSS_ROOT_NAME}/linux-arm64-gcc8_2:latest
+
+# END: Manifest generation
