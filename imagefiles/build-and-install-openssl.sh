@@ -85,7 +85,8 @@ function build_perl {
     check_var ${perl_sha256}
     check_var ${PERL_DOWNLOAD_URL}
     curl --connect-timeout 30 \
-        --max-time 10 \
+        --speed-limit 1024 \
+        --speed-time 20 \
         --retry 5 \
         --retry-delay 10 \
         --retry-max-time 30 \
@@ -110,7 +111,8 @@ function build_openssl {
     check_var ${openssl_sha256}
     check_var ${OPENSSL_DOWNLOAD_URL}
     curl --connect-timeout 30 \
-        --max-time 10 \
+        --speed-limit 1024 \
+        --speed-time 20 \
         --retry 5 \
         --retry-delay 10 \
         --retry-max-time 30 \

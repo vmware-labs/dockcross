@@ -6,7 +6,8 @@ OPENSSH_ROOT=V_8_7_P1
 
 cd /usr/src
 curl --connect-timeout 20 \
-    --max-time 10 \
+    --speed-limit 1024 \
+    --speed-time 20 \
     --retry 5 \
     --retry-delay 10 \
     --retry-max-time 40 \

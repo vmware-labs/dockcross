@@ -27,7 +27,8 @@ gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys B42F6819007F00F88E364F
 
 echo "Downloading $url"
 curl --connect-timeout 30 \
-    --max-time 10 \
+    --speed-limit 1024 \
+    --speed-time 20 \
     --retry 5 \
     --retry-delay 10 \
     --retry-max-time 30 \
@@ -35,7 +36,8 @@ curl --connect-timeout 30 \
 
 echo "Downloading $url_key"
 curl --connect-timeout 30 \
-    --max-time 10 \
+    --speed-limit 1024 \
+    --speed-time 20 \
     --retry 5 \
     --retry-delay 10 \
     --retry-max-time 30 \

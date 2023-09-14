@@ -34,7 +34,8 @@ fi
 url="https://github.com/ninja-build/ninja/archive/v${NINJA_VERSION}.tar.gz"
 
 curl --connect-timeout 30 \
-    --max-time 10 \
+    --speed-limit 1024 \
+    --speed-time 20 \
     --retry 5 \
     --retry-delay 10 \
     --retry-max-time 30 \
